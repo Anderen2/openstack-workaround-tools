@@ -19,6 +19,7 @@ argparser.add_argument("--port", dest="port", default="2181", help="Port towards
 argparser.add_argument("-v", dest="verbose", action="store_true", help="Be more verbose")
 argparser.add_argument("--dryrun", dest="dryrun", action="store_true", help="Only print, do not actually create")
 argparser.add_argument("--bridge", dest="bridge", action="store_true", help="Create missing bridge ports (Adds extra check on network existance)")
+argparser.add_argument("--delete", dest="delete", action="store_true", help="Deletes nodes (non-recursive) instead of creating")
 cliargs = argparser.parse_args()
 
 zk = KazooClient(hosts='%s:%s' % (cliargs.host, cliargs.port))
@@ -50,11 +51,13 @@ with open(cliargs.file, "r") as fd:
 
 missing_paths = []
 for path in file_content.split("\n"):
+    if path=="": continue
     if not zk.exists(path):
         print("Path not found: %s" % path)
-        missing_paths.append(path)
-    elif cliargs.verbose:
-        print("Path found: %s" % path)
+        if not cliargs.delete: missing_paths.append(path)
+    else:
+        if cliargs.verbose: print("Path found: %s" % path)
+        if cliargs.delete: missing_paths.append(path)
 
 if cliargs.bridge:
     valid_paths = []
@@ -70,7 +73,13 @@ if cliargs.bridge:
 else:
     valid_paths = missing_paths
     
-if yesno("%s paths missing, do you want to continue with adding? (yes/no) %s" % (len(missing_paths), "[DRYRUN]" if cliargs.dryrun else "")):
-    for path in valid_paths:
-        print("Creating: %s" % path)
-        if not cliargs.dryrun: zk.ensure_path(path)
+if not cliargs.delete:
+    if yesno("%s paths missing, do you want to continue with adding? (yes/no) %s" % (len(missing_paths), "[DRYRUN]" if cliargs.dryrun else "")):
+        for path in valid_paths:
+            print("Creating: %s" % path)
+            if not cliargs.dryrun: zk.ensure_path(path) 
+else:
+    if yesno("%s paths will be deleted, do you want to continue? (yes/no) %s" % (len(missing_paths), "[DRYRUN]" if cliargs.dryrun else "")):
+        for path in valid_paths:
+            print("Deleting: %s" % path)
+            if not cliargs.dryrun: zk.delete(path)
