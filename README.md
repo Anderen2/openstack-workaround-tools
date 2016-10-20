@@ -2,6 +2,7 @@
 
 ### Midonet / Zookeeper scripts for syncing missing network ports / bridge mac_maps missing after upgrade
 #### zk_neutron_pathdump.py
+```bash
 usage: zk_neutron_pathdump.py [-h] [--file FILE] [--username USERNAME]
                               [--password PASSWORD]
                               [--project_name PROJECT_NAME]
@@ -31,9 +32,10 @@ optional arguments:
   --endpoint_type ENDPOINT_TYPE
                         Openstack endpoint_type
   --bridge              Dump bridge mac_maps
-
+```
 
 #### zk_path_create.py
+```bash
 usage: zk_path_create.py [-h] [--host HOST] [--port PORT] [-v] [--dryrun]
                          [--bridge]
                          file
@@ -56,3 +58,4 @@ optional arguments:
   --dryrun     Only print, do not actually create
   --bridge     Create missing bridge ports (Adds extra check on network
                existance)
+```
