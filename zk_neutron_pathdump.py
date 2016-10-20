@@ -1,4 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
+__author__ = "Andreas Skoglund"
+__copyright__ = "Copyright 2016, Basefarm"
+__license__ = "MIT"
+
 import argparse
 from getpass import getpass
 from keystoneauth1 import identity
